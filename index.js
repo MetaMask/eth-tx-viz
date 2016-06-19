@@ -1,54 +1,128 @@
+const extend = require('xtend')
 const h = require('virtual-dom/virtual-hyperscript/svg')
 const createElement = require('virtual-dom/create-element')
-const vdomStringify = require('virtual-dom-stringify')
-const traceData = require('./trace.json')
-const contractNicknames = require('./nicknames.json')
+const diff = require('virtual-dom/diff');
+const patch = require('virtual-dom/patch');
+const contractNicknames = require('./lib/nicknames.json')
 const ColorPalette = require('./lib/palette')
+const traceData = require('./trace.json')
+
+// state
+var state = {
+  accounts: extend(traceData.accounts),
+  calls: [],
+}
+
+// update state and rerender
+var counter = 0
+setInterval(function(){
+  counter++
+  state.calls = traceData.calls.slice(0,counter)
+  rerender(state)
+}, 1000)
 
 // setup dom
-var tree = render()
+var tree = render(state)
 var rootNode = createElement(tree)
 document.body.appendChild(rootNode)
 document.body.style.background = '#333'
 
-function render(){
+function rerender(){
+  var newTree = render(state)
+  var patches = diff(tree, newTree)
+  rootNode = patch(rootNode, patches)
+  tree = newTree
+}
 
-  var defs = []
-  defs.push(markerArrow())
+function render(state){
 
-  var nodes = renderNodes()
-  var labels = renderLabels()
-  var paths = renderPaths()
+  var defs = [markerArrow()]
 
-  var pathLabels = renderPathLabels()
+  var nodePositions = calcNodePositions(state.accounts)
 
-  // defs = defs.concat(renderPaths())
+  var nodes = h('g.nodes', renderAccounts(nodePositions, state.accounts))
+  var links = h('g.links', renderCalls(nodePositions, state.calls))
 
   return (
 
     svg([
       h('defs', defs),
       nodes,
-      labels,
-      paths,
-      pathLabels,
+      links,
     ])
 
   )
+}
+
+function calcNodePositions(accountData){
+  var nodePositions = {}
+  var accountList = valuesFor(accountData)
+  accountList.map((account, index) => {
+    var rotRadians = 2*Math.PI*(index/accountList.length)
+    var layoutCenter = [260,220]
+    var layoutCircleRadius = 200
+    var nodeCenter = [
+      layoutCenter[0]+layoutCircleRadius*Math.cos(rotRadians),
+      layoutCenter[0]+layoutCircleRadius*Math.sin(rotRadians),
+    ]
+    nodePositions[account.address] = nodeCenter
+  })
+  return nodePositions
+}
+
+// accounts -> nodes
+function renderAccounts(nodePositions, accountData){
+  var pallete = ColorPalette()
+  return valuesFor(accountData).map((account, index) => {
+    var color = pallete.getColor()
+    var nodeCenter = nodePositions[account.address]
+    return renderAccount(nodeCenter, color, account)
+  })
+}
+
+// accounts -> nodes
+function renderCalls(nodePositions, callList){
+  var pallete = ColorPalette()
+  
+  return callList.map((callTrace, index) => {
+    var color = pallete.getColor()
+    var start = nodePositions[callTrace.fromAddress]
+    var end = nodePositions[callTrace.toAddress]
+    var pathId = `call-${index}`
+    return h('g', [
+
+      path(pathId, start, end),
+      pathLabel(pathId, 'call'),
+
+    ])
+  })
+
+}
+
+function renderAccount(nodeCenter, color, account){
+  return h('g', [
+
+    circle(nodeCenter, 20, {
+      stroke: color,
+      fill: color,
+      'fill-opacity': .4,
+    }),
+
+    label(nodeCenter, getNodeLabel(account.address)),
+
+  ])
 }
 
 function svg(children){
   return (
 
     h('svg', {
-      // 'attributes': {
-        'height': '480',
-        'version': '1.1',
-        'width': '640',
-        'xmlns': 'http://www.w3.org/2000/svg',
-        'xlink': 'http://www.w3.org/1999/xlink',
-      // },
-      'style': {
+      height: '480',
+      version: '1.1',
+      width: '640',
+      xmlns: 'http://www.w3.org/2000/svg',
+      xlink: 'http://www.w3.org/1999/xlink',
+      style: {
         overflow: 'hidden',
         position: 'relative',
         background: '#333',
@@ -56,15 +130,6 @@ function svg(children){
     }, children)
 
   )
-}
-
-function styleFix(opts){
-  var styleObj = {}
-  opts.value.split(';')
-    .map(prop=>prop.trim())
-    .map(prop=>prop.split(': '))
-    .map(keyValue=>styleObj[keyValue[0]]=keyValue[1])
-  return styleObj
 }
 
 function markerArrow(){
@@ -89,163 +154,15 @@ function markerArrow(){
   )
 }
 
-function renderNodes(){
+
+function circle(center, radius, attrs) {
   return (
 
-    h('g', [
-
-      h('circle', {
-        'cx': '460',
-        'cy': '220',
-        'r': '20',
-        'fill': '#26bf00',
-        'stroke': '#26bf00',
-        'style': {
-          'fillOpacity': 0.4,
-        },
-      }),
-      h('circle', {
-        'cx': '360',
-        'cy': '393.2',
-        'r': '20',
-        'fill': '#00bf2f',
-        'stroke': '#00bf2f',
-        'style': {
-          'fillOpacity': 0.4,
-        },
-      }),
-      h('circle', {
-        'cx': '160',
-        'cy': '393.2',
-        'r': '20',
-        'fill': '#00bf85',
-        'stroke': '#00bf85',
-        'style': {
-          'fillOpacity': 0.4,
-        },
-      }),
-      h('circle', {
-        'cx': '60',
-        'cy': '220',
-        'r': '20',
-        'fill': '#00a2bf',
-        'stroke': '#00a2bf',
-        'style': {
-          'fillOpacity': 0.4,
-        },
-      }),
-      h('circle', {
-        'cx': '159.99999999999991',
-        'cy': '46.79491924311233',
-        'r': '20',
-        'fill': '#004cbf',
-        'stroke': '#004cbf',
-        'style': {
-          'fillOpacity': 0.4,
-        },
-      }),
-      h('circle', {
-        'cx': '360',
-        'cy': '46.794919243112275',
-        'r': '20',
-        'fill': '#0900bf',
-        'stroke': '#0900bf',
-        'style': {
-          'fillOpacity': 0.4,
-        },
-      }),
-
-    ])
-
-  )
-}
-
-function renderLabels(){
-  return (
-
-    h('g', [
-
-      label({  
-        'x': '460',
-        'y': '220',
-        'name': `AttackerProxy-f835`,
-      }),
-      label({  
-        'x': '360',
-        'y': '393.2',
-        'name': `Attacker`,
-      }),
-      label({  
-        'x': '160',
-        'y': '393.2',
-        'name': `TheDAO`,
-      }),
-      label({  
-        'x': '60',
-        'y': '220',
-        'name': `DarkDAO`,
-      }),
-      label({  
-        'x': '159.99999999999991',
-        'y': '46.79491924311233',
-        'name': `DarkDAO extraBalance`,
-      }),
-      label({  
-        'x': '360',
-        'y': '46.794919243112275',
-        'name': `TheDAO rewardAccount`,
-      }),
-
-    ])
-
-  )
-}
-
-function label(opts){
-  return (
-
-    h('text', {
-      'attributes': {
-        'x': opts.x,
-        'y': opts.y,
-        'textAnchor': 'start',
-        'fontFamily': 'Arial',
-        'fontSize': '10px',
-        'stroke': 'none',
-        'fill': '#ffffff',
-        'font': '12px Fontin-Sans, Arial'
-      },
-      'style': styleFix({
-        'name': 'style',
-        'value': 'WebkitTapHighlightColor: rgba(0, 0, 0, 0); textAnchor: start; fontFamily: Fontin-Sans, Arial; fontSize: 12px; fontStyle: normal; fontVariant: normal; fontWeight: normal; fontStretch: normal; lineHeight: normal;'
-      }),
-    }, [
-      h('tspan', {
-        'attributes': {
-          'dy': '4.013669243112275'
-        },
-        'style': styleFix({
-          'name': 'style',
-          'value': 'WebkitTapHighlightColor: rgba(0, 0, 0, 0);'
-        }),
-      }, opts.name)
-    ])
-
-  )
-}
-
-function renderPaths(){
-  return (
-
-    h('g', [
-    // [
-
-      path('link0', [460,220],[360,393.2]),
-      path('link1', [460,220],[160,393.2]),
-      path('link2', [160,393.2],[60,220]),
-
-    ])
-    // ]
+    h('circle', extend({
+      cx: center[0],
+      cy: center[1],
+      r: radius,
+    }, attrs))
 
   )
 }
@@ -261,44 +178,78 @@ function path(id, start, end){
       'stroke-width': '2',
       'style': {
         markerEnd: 'url(\'#markerArrow\')',
-        opacity: 0.2,
+        opacity: 1,
       },
     })
 
   )
 }
 
-function renderPathLabels(){
+function label(pos, name, attrs){
+  attrs = attrs || {}
   return (
 
-    h('g', [
-
-      pathLabel('link0', 'why hello there'),
-      pathLabel('link1', 'why hello there'),
-      pathLabel('link2', 'why hello there'),
-
+    h('text', extend({
+      'x': pos[0],
+      'y': pos[1],
+      'style': {
+        fontSize: '10px',
+        stroke: 'none',
+        fill: '#ffffff',
+        textAnchor: 'middle',
+        fontFamily: 'Fontin-Sans, Arial',
+        fontSize: '12px',
+        fontStyle: 'normal',
+        fontVariant: 'normal',
+        fontWeight: 'normal',
+        fontStretch: 'normal',
+        lineHeight: 'normal',
+      },
+    }, attrs), [
+      h('tspan', extend({
+        'dy': '4.013669243112275',
+      }, attrs.tspan), name)
     ])
 
   )
 }
 
-function pathLabel(id, label){
+function pathLabel(id, label, attrs){
+  attrs = attrs || {}
   return (
 
-    h('text', {
-      'attributes': {
-        'dy': '-6'
-      },
-      'style': {
+    h('text', extend({
+      dy: '-6',
+      style: {
         'text-anchor': 'middle',
-        'font': '16px sans-serif',
+        font: '12px sans-serif',
+        fill: '#ffffff',
       },
-    }, [
-      h('textPath', {
+    }, attrs), [
+      h('textPath', extend({
         'xlink:href': `#${id}`,
         'startOffset': '50%',
-      }, label)
+      }, attrs), label)
     ])
 
   )
+}
+
+
+// util
+
+function getNodeLabel(address){
+  var nickname = contractNicknames[address]
+  return nickname || address.slice(0,8)
+}
+
+function valuesFor(obj){
+  return Object.keys(obj).map(key=>obj[key])
+}
+
+function forKeyValue(obj, fn){
+  for (var key in obj){
+    var val = obj[key]
+    fn(key, val)
+  }
 }
