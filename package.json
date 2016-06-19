@@ -10,8 +10,8 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cd www && beefy ../index.js:index.js --live --open",
-    "build": "browserify index.js > www/index.js && buildbranch gh-pages www"
+    "start": "cd www && beefy ../index.js:bundle.js --live --open",
+    "build": "browserify index.js > www/bundle.js && buildbranch gh-pages www"
   },
   "repository": {
     "type": "git",
