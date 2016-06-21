@@ -4,6 +4,9 @@ const diff = require('virtual-dom/diff')
 const patch = require('virtual-dom/patch')
 const traceData = require('./trace.json')
 const renderGraph = require('./lib/render')
+const h = require('virtual-dom/virtual-hyperscript')
+const renderNavigation = require('./lib/navigation')
+
 
 // state
 var state = {
@@ -14,15 +17,14 @@ var state = {
 // update state and rerender
 var counter = 0
 var loop = setInterval(function(){
-  counter++
 
   // empty the call stack to be repopulated
   
 
   // For the current snapshot of the stack, 
   // push the appropriate elements to be rendered.
-  // if we reach the end of the stackTrace, do not rerender.
-  var currentStack = traceData.stackTrace[counter]
+  // if we reach the end of the stackFrames, do not rerender.
+  var currentStack = traceData.stackFrames[counter]
 
   if (currentStack) {
     state.calls = currentStack.map(function(element) {
@@ -35,19 +37,29 @@ var loop = setInterval(function(){
 
   // state.calls = traceData.calls.slice(0,counter)
   // debugger;
+  counter++
   rerender()
 }, 1000)
 
 // setup dom
-var tree = renderGraph(state)
+var tree = render(state)
 var rootNode = createElement(tree)
+
 document.body.appendChild(rootNode)
 document.body.style.background = '#333'
 
 function rerender(){
-  var newTree = renderGraph(state)
+  var newTree = render(state)
   var patches = diff(tree, newTree)
   rootNode = patch(rootNode, patches)
   tree = newTree
 }
 
+function render(state) {
+  return (
+    h("div",[
+      h("div","Hello World"),
+      renderGraph(state)
+      ])
+  )
+}
