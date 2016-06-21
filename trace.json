@@ -19,6 +19,7 @@
             "address": "0xd2e16a20dd7b1ae54fb0312209784478d069c7b0"
         }
     },
+    "stackTrace": [[0],[1],[1,2],[1,2,3],[1,4],[1,5],[1,6],[1,6,7],[1,6,7,8],[1,6,7,9],[1,6,7,8,9,10],[1,6,7,8,9,10,11],[1,6,7,8,9,12],[1,6,7,8,9,13],[1,6,7,8,9,14],[1,6,7,8,9,15],[1,6,7,8,9,16],[1,6,7,8,9,17],[1,6,7,8,9,18]],
     "calls": [{
         "sequence": 0,
         "depth": 0,
@@ -29,7 +30,7 @@
         "inOffset": "0x60",
         "inLength": 0,
         "outOffset": "0x60",
-        "outLength": 0
+        "outLength": 0,
     }, {
         "sequence": 1,
         "depth": 0,
@@ -40,7 +41,7 @@
         "inOffset": "0x60",
         "inLength": "0x44",
         "outOffset": "0x60",
-        "outLength": "0x20"
+        "outLength": "0x20",
     }, {
         "sequence": 2,
         "depth": 1,
@@ -51,7 +52,7 @@
         "inOffset": "0x60",
         "inLength": "0x24",
         "outOffset": "0x60",
-        "outLength": "0x20"
+        "outLength": "0x20",
     }, {
         "sequence": 3,
         "depth": 2,
@@ -62,7 +63,7 @@
         "inOffset": "0x60",
         "inLength": 0,
         "outOffset": "0x60",
-        "outLength": 0
+        "outLength": 0,
     }, {
         "sequence": 4,
         "depth": 1,
