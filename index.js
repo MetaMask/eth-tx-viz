@@ -33,10 +33,6 @@ var loop = setInterval(function(){
   } else {
     clearInterval(loop)
   }
-
-
-  // state.calls = traceData.calls.slice(0,counter)
-  // debugger;
   counter++
   rerender()
 }, 1000)
@@ -58,8 +54,8 @@ function rerender(){
 function render(state) {
   return (
     h("div",[
-      h("div","Hello World"),
-      renderGraph(state)
+      renderGraph(state),
+      renderNavigation()
       ])
   )
 }
