@@ -4,6 +4,7 @@ const diff = require('virtual-dom/diff')
 const patch = require('virtual-dom/patch')
 const traceData = require('./trace.json')
 const renderGraph = require('./lib/render')
+const renderMenu = require('./lib/menu')
 const h = require('virtual-dom/virtual-hyperscript')
 const renderNavigation = require('./lib/navigation')
 const addAbiData = require('./lib/add-abi-data')
@@ -19,13 +20,24 @@ var state = {
 }
 
 // update state and rerender
-var counter = 0
+var frameNumber = 0
 var loop = setInterval(function(){
+  renderAtFrame(frameNumber, false)
+  frameNumber++
+}, 1000)
+
+function renderAtFrame(i, manual) {
+  frameNumber = i
+  console.log("rendering at frame " + i)
+  if (manual) {
+    console.log('clearing interval')
+    clearInterval(loop)
+  }
 
   // For the current frame of the transaction trace,
   // show the current stack
   // if we reach the end of the stackFrames, do not rerender.
-  var currentStack = traceData.stackFrames[counter]
+  var currentStack = traceData.stackFrames[frameNumber]
 
   if (currentStack) {
     state.calls = currentStack.map(function(element) {
@@ -35,9 +47,8 @@ var loop = setInterval(function(){
     clearInterval(loop)
   }
 
-  counter++
   rerender()
-}, 1000)
+}
 
 // setup dom
 var tree = render(state)
@@ -55,9 +66,16 @@ function rerender(){
 function render(state) {
   return (
 
-    h('div',[
-      h('div','Transaction Replay'),
-      renderGraph(state)
+    h('div', { style: { fontFamily: 'monospace' } }, [
+      h('h1','Transaction Replay'),
+      h('div', {
+        style: {
+          display: 'flex'
+        }
+      }, [
+        renderGraph(state),
+        renderMenu(frameNumber, traceData.calls, (i) => renderAtFrame(i, true)),
+      ])
     ])
 
   )
