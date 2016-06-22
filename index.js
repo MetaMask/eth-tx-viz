@@ -52,6 +52,18 @@ function selectFrame(frameIndex){
   rerender()
 }
 
+function forwardFrame() {
+  selectFrame(state.frameIndex + 1)
+}
+
+function backFrame() {
+  selectFrame(state.frameIndex - 1)
+}
+
+function toggleAutoplay() {
+  state.autoplay = !state.autoplay
+}
+
 // setup dom
 var tree = render(state)
 var rootNode = createElement(tree)
@@ -78,8 +90,12 @@ function render(state) {
         renderGraph(state),
         renderCallHistory(state.frameIndex, traceData.calls, {
           selectFrame: selectFrame
-        }),
-      ])
+        })
+      ]),        renderNavigation({
+          forwardFrame: forwardFrame,
+          backFrame: backFrame,
+          toggleAutoplay: toggleAutoplay
+        })
     ])
 
   )
