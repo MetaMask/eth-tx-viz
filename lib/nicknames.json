@@ -10,7 +10,8 @@
   "0xad3ecf23c0c8983b07163708be6d763b5f056193": "DarkDAO rewardAccount",
   "0x1d29edb6997993a16c5086733cfd735d01df787c": "DarkDAO DAOrewardAccount",
   "0xb656b2a9c3b2416437a811e07466ca712f5a5b5a": "DarkDAO Curator",
-  "0x969837498944ae1dc0dcac2d0c65634c88729b2d": "Attacker",
   "0xc0ee9db1a9e07ca63e4ff0d5fb6f86bf68d47b89": "AttackerProxy-c0ee",
-  "0xf835a0247b0063c04ef22006ebe57c5f11977cc4": "AttackerProxy-f835"  
+  "0xf835a0247b0063c04ef22006ebe57c5f11977cc4": "AttackerProxy-f835",
+  "0xf35e2cc8e6523d683ed44870f5b7cc785051a77d": "AttackerA",
+  "0x969837498944ae1dc0dcac2d0c65634c88729b2d": "AttackerB"
 }
