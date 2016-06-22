@@ -1,0 +1,1 @@
+[{"constant":false,"inputs":[{"name":"_curator","type":"address"},{"name":"_proposalDeposit","type":"uint256"},{"name":"_minTokensToCreate","type":"uint256"},{"name":"_closingTime","type":"uint256"}],"name":"createDAO","outputs":[{"name":"_newDAO","type":"address"}],"type":"function"}]
