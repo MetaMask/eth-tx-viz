@@ -6,7 +6,11 @@ const traceData = require('./trace.json')
 const renderGraph = require('./lib/render')
 const h = require('virtual-dom/virtual-hyperscript')
 const renderNavigation = require('./lib/navigation')
+const addAbiData = require('./lib/add-abi-data')
+const ABIs = require('./lib/abi')
 
+// decorate calls with ABI-sourced data
+addAbiData(traceData.calls, ABIs)
 
 // state
 var state = {
