@@ -18,11 +18,8 @@ var state = {
 var counter = 0
 var loop = setInterval(function(){
 
-  // empty the call stack to be repopulated
-  
-
-  // For the current snapshot of the stack, 
-  // push the appropriate elements to be rendered.
+  // For the current frame of the transaction trace,
+  // show the current stack
   // if we reach the end of the stackFrames, do not rerender.
   var currentStack = traceData.stackFrames[counter]
 
@@ -34,9 +31,6 @@ var loop = setInterval(function(){
     clearInterval(loop)
   }
 
-
-  // state.calls = traceData.calls.slice(0,counter)
-  // debugger;
   counter++
   rerender()
 }, 1000)
@@ -44,7 +38,6 @@ var loop = setInterval(function(){
 // setup dom
 var tree = render(state)
 var rootNode = createElement(tree)
-
 document.body.appendChild(rootNode)
 document.body.style.background = '#333'
 
@@ -57,9 +50,11 @@ function rerender(){
 
 function render(state) {
   return (
-    h("div",[
-      h("div","Hello World"),
+
+    h('div',[
+      h('div','Transaction Replay'),
       renderGraph(state)
-      ])
+    ])
+
   )
 }
