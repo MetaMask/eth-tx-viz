@@ -21,6 +21,8 @@ var state = {
   autoplay: true,
 }
 
+var totalCalls = traceData.calls.length
+
 // update state and rerender
 setInterval(function(){
   updateStackFrame()
@@ -64,6 +66,10 @@ function toggleAutoplay() {
   state.autoplay = !state.autoplay
 }
 
+function autoplayStatus() {
+  return `Autoplay ${state.autoplay ? ("Enabled") : ("Disabled")}`
+}
+
 // setup dom
 var tree = render(state)
 var rootNode = createElement(tree)
@@ -82,6 +88,8 @@ function render(state) {
 
     h('div', { style: { fontFamily: 'monospace' } }, [
       h('h1','Transaction Replay'),
+      h('h2', `Step ${state.frameIndex} of ${totalCalls}`),
+      h('h2', autoplayStatus()),
       h('div', {
         style: {
           display: 'flex'
