@@ -3,10 +3,10 @@ const createElement = require('virtual-dom/create-element')
 const diff = require('virtual-dom/diff')
 const patch = require('virtual-dom/patch')
 const traceData = require('./trace.json')
-const renderGraph = require('./lib/render')
-const renderMenu = require('./lib/menu')
 const h = require('virtual-dom/virtual-hyperscript')
 const renderNavigation = require('./lib/navigation')
+const renderGraph = require('./lib/render')
+const renderCallHistory = require('./lib/call-history')
 const addAbiData = require('./lib/add-abi-data')
 const ABIs = require('./lib/abi')
 
@@ -17,36 +17,38 @@ addAbiData(traceData.calls, ABIs)
 var state = {
   accounts: extend(traceData.accounts),
   calls: [],
+  frameIndex: 0,
+  autoplay: true,
 }
 
 // update state and rerender
-var frameNumber = 0
-var loop = setInterval(function(){
-  renderAtFrame(frameNumber, false)
-  frameNumber++
+setInterval(function(){
+  updateStackFrame()
+  rerender()
 }, 1000)
 
-function renderAtFrame(i, manual) {
-  frameNumber = i
-  console.log("rendering at frame " + i)
-  if (manual) {
-    console.log('clearing interval')
-    clearInterval(loop)
-  }
+function updateStackFrame() {
 
   // For the current frame of the transaction trace,
   // show the current stack
   // if we reach the end of the stackFrames, do not rerender.
-  var currentStack = traceData.stackFrames[frameNumber]
+  var currentStack = traceData.stackFrames[state.frameIndex]
 
   if (currentStack) {
     state.calls = currentStack.map(function(element) {
       return traceData.calls[element]
     })
-  } else {
-    clearInterval(loop)
   }
 
+  if (state.autoplay) {
+    state.frameIndex++
+  }
+}
+
+function selectFrame(frameIndex){
+  state.frameIndex = frameIndex
+  state.autoplay = false
+  updateStackFrame()
   rerender()
 }
 
@@ -74,7 +76,9 @@ function render(state) {
         }
       }, [
         renderGraph(state),
-        renderMenu(frameNumber, traceData.calls, (i) => renderAtFrame(i, true)),
+        renderCallHistory(state.frameIndex, traceData.calls, {
+          selectFrame: selectFrame
+        }),
       ])
     ])
 
