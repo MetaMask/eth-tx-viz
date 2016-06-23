@@ -95,6 +95,11 @@ function render(state) {
       h('h2', `Step ${state.frameIndex} of ${totalCalls}`),
       h('h2', `Stack Level: ${stackDepth}`),
       h('h2', autoplayStatus()),
+      renderNavigation({
+          forwardFrame: forwardFrame,
+          backFrame: backFrame,
+          toggleAutoplay: toggleAutoplay
+      }),
       h('div', {
         style: {
           display: 'flex',
@@ -104,12 +109,7 @@ function render(state) {
         renderCallHistory(state.frameIndex, traceData.calls, {
           selectFrame: selectFrame
         })
-      ]), 
-      renderNavigation({
-          forwardFrame: forwardFrame,
-          backFrame: backFrame,
-          toggleAutoplay: toggleAutoplay
-      })
+      ])
     ])
 
   )
