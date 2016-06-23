@@ -21,6 +21,8 @@ var state = {
   autoplay: true,
 }
 
+var totalCalls = traceData.calls.length
+
 // update state and rerender
 setInterval(function(){
   updateStackFrame()
@@ -38,6 +40,8 @@ function updateStackFrame() {
     state.calls = currentStack.map(function(element) {
       return traceData.calls[element]
     })
+  } else {
+    state.autoplay = false
   }
 
   if (state.autoplay) {
@@ -45,11 +49,29 @@ function updateStackFrame() {
   }
 }
 
-function selectFrame(frameIndex){
-  state.frameIndex = frameIndex
-  state.autoplay = false
+function selectFrame() {
   updateStackFrame()
   rerender()
+}
+
+function forwardFrame() {
+  state.autoplay = false
+  state.frameIndex++
+  selectFrame()
+}
+
+function backFrame() {
+  state.autoplay = false
+  state.frameIndex--
+  selectFrame()
+}
+
+function toggleAutoplay() {
+  state.autoplay = !state.autoplay
+}
+
+function autoplayStatus() {
+  return `Autoplay ${state.autoplay ? ("Enabled") : ("Disabled")}`
 }
 
 // setup dom
@@ -70,6 +92,8 @@ function render(state) {
 
     h('div', { style: { fontFamily: 'monospace' } }, [
       h('h1','Transaction Replay'),
+      h('h2', `Step ${state.frameIndex} of ${totalCalls}`),
+      h('h2', autoplayStatus()),
       h('div', {
         style: {
           display: 'flex'
@@ -78,8 +102,12 @@ function render(state) {
         renderGraph(state),
         renderCallHistory(state.frameIndex, traceData.calls, {
           selectFrame: selectFrame
-        }),
-      ])
+        })
+      ]),        renderNavigation({
+          forwardFrame: forwardFrame,
+          backFrame: backFrame,
+          toggleAutoplay: toggleAutoplay
+        })
     ])
 
   )
