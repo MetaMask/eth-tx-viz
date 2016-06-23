@@ -40,6 +40,8 @@ function updateStackFrame() {
     state.calls = currentStack.map(function(element) {
       return traceData.calls[element]
     })
+  } else {
+    state.autoplay = false
   }
 
   if (state.autoplay) {
@@ -47,19 +49,21 @@ function updateStackFrame() {
   }
 }
 
-function selectFrame(frameIndex){
-  state.frameIndex = frameIndex
-  state.autoplay = false
+function selectFrame() {
   updateStackFrame()
   rerender()
 }
 
 function forwardFrame() {
-  selectFrame(state.frameIndex + 1)
+  state.autoplay = false
+  state.frameIndex++
+  selectFrame()
 }
 
 function backFrame() {
-  selectFrame(state.frameIndex - 1)
+  state.autoplay = false
+  state.frameIndex--
+  selectFrame()
 }
 
 function toggleAutoplay() {
