@@ -21,6 +21,9 @@ var state = {
   autoplay: true,
 }
 
+var totalCalls = traceData.calls.length
+var stackDepth = 0
+
 // update state and rerender
 setInterval(function(){
   updateStackFrame()
@@ -35,12 +38,14 @@ function updateStackFrame() {
   var currentStack = traceData.stackFrames[state.frameIndex]
 
   if (currentStack) {
+    stackDepth = currentStack.length
     state.calls = currentStack.map(function(element) {
       return traceData.calls[element]
     })
   }
 
   if (state.autoplay) {
+    location.href = `#stack-item-${state.frameIndex}`
     state.frameIndex++
   }
 }
@@ -48,9 +53,31 @@ function updateStackFrame() {
 function selectFrame(frameIndex){
   state.frameIndex = frameIndex
   state.autoplay = false
+  changeFocus()
   updateStackFrame()
   rerender()
 }
+
+function changeFocus() {
+  location.href = `#stack-item-${state.frameIndex}`
+}
+
+function forwardFrame() {
+  selectFrame(state.frameIndex + 1)
+}
+
+function backFrame() {
+  selectFrame(state.frameIndex - 1)
+}
+
+function toggleAutoplay() {
+  state.autoplay = !state.autoplay
+}
+
+function autoplayStatus() {
+  return `Autoplay ${state.autoplay ? ("Enabled") : ("Disabled")}`
+}
+
 
 // setup dom
 var tree = render(state)
@@ -70,15 +97,23 @@ function render(state) {
 
     h('div', { style: { fontFamily: 'monospace' } }, [
       h('h1','Transaction Replay'),
+      h('h2', `Step ${state.frameIndex} of ${totalCalls}`),
+      h('h2', `Stack Level: ${stackDepth}`),
+      h('h2', autoplayStatus()),
+      renderNavigation({
+          forwardFrame: forwardFrame,
+          backFrame: backFrame,
+          toggleAutoplay: toggleAutoplay
+      }),
       h('div', {
         style: {
-          display: 'flex'
+          display: 'flex',
         }
       }, [
         renderGraph(state),
         renderCallHistory(state.frameIndex, traceData.calls, {
           selectFrame: selectFrame
-        }),
+        })
       ])
     ])
 
