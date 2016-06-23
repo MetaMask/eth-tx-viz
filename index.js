@@ -22,6 +22,7 @@ var state = {
 }
 
 var totalCalls = traceData.calls.length
+var stackDepth = 0
 
 // update state and rerender
 setInterval(function(){
@@ -35,6 +36,7 @@ function updateStackFrame() {
   // show the current stack
   // if we reach the end of the stackFrames, do not rerender.
   var currentStack = traceData.stackFrames[state.frameIndex]
+  stackDepth = currentStack.length
 
   if (currentStack) {
     state.calls = currentStack.map(function(element) {
@@ -89,6 +91,7 @@ function render(state) {
     h('div', { style: { fontFamily: 'monospace' } }, [
       h('h1','Transaction Replay'),
       h('h2', `Step ${state.frameIndex} of ${totalCalls}`),
+      h('h2', `Stack Level: ${stackDepth}`),
       h('h2', autoplayStatus()),
       h('div', {
         style: {
@@ -99,11 +102,12 @@ function render(state) {
         renderCallHistory(state.frameIndex, traceData.calls, {
           selectFrame: selectFrame
         })
-      ]),        renderNavigation({
+      ]), 
+      renderNavigation({
           forwardFrame: forwardFrame,
           backFrame: backFrame,
           toggleAutoplay: toggleAutoplay
-        })
+      })
     ])
 
   )
