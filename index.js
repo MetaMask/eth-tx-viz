@@ -36,15 +36,16 @@ function updateStackFrame() {
   // show the current stack
   // if we reach the end of the stackFrames, do not rerender.
   var currentStack = traceData.stackFrames[state.frameIndex]
-  stackDepth = currentStack.length
 
   if (currentStack) {
+    stackDepth = currentStack.length
     state.calls = currentStack.map(function(element) {
       return traceData.calls[element]
     })
   }
 
   if (state.autoplay) {
+    location.href = `#stack-item-${state.frameIndex}`
     state.frameIndex++
   }
 }
@@ -52,6 +53,7 @@ function updateStackFrame() {
 function selectFrame(frameIndex){
   state.frameIndex = frameIndex
   state.autoplay = false
+  location.href = `#stack-item-${state.frameIndex}`
   updateStackFrame()
   rerender()
 }
@@ -95,7 +97,7 @@ function render(state) {
       h('h2', autoplayStatus()),
       h('div', {
         style: {
-          display: 'flex'
+          display: 'flex',
         }
       }, [
         renderGraph(state),
