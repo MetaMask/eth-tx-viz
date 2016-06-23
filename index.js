@@ -53,9 +53,13 @@ function updateStackFrame() {
 function selectFrame(frameIndex){
   state.frameIndex = frameIndex
   state.autoplay = false
-  location.href = `#stack-item-${state.frameIndex}`
+  changeFocus()
   updateStackFrame()
   rerender()
+}
+
+function changeFocus() {
+  location.href = `#stack-item-${state.frameIndex}`
 }
 
 function forwardFrame() {
@@ -73,6 +77,7 @@ function toggleAutoplay() {
 function autoplayStatus() {
   return `Autoplay ${state.autoplay ? ("Enabled") : ("Disabled")}`
 }
+
 
 // setup dom
 var tree = render(state)
