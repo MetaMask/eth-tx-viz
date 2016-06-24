@@ -83,7 +83,7 @@ function autoplayStatus() {
 var tree = render(state)
 var rootNode = createElement(tree)
 document.body.appendChild(rootNode)
-document.body.style.background = '#333'
+// document.body.style.background = '#333'
 
 function rerender(){
   var newTree = render(state)
@@ -95,8 +95,10 @@ function rerender(){
 function render(state) {
   return (
 
-    h('div', { style: { fontFamily: 'monospace' } }, [
-      h('h1','Transaction Replay'),
+    h('div', { style: { fontFamily: 'Open Sans' } }, [
+      h('h1', { style: {textTransform: "uppercase", 
+                        fontWeight: 300,
+                        letterSpacing: "2px"}},'Transaction Replay'),
       h('h2', `Step ${state.frameIndex} of ${totalCalls}`),
       h('h2', `Stack Level: ${stackDepth}`),
       h('h2', autoplayStatus()),
