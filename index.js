@@ -83,7 +83,6 @@ function autoplayStatus() {
 var tree = render(state)
 var rootNode = createElement(tree)
 document.body.appendChild(rootNode)
-document.body.style.background = '#333'
 
 function rerender(){
   var newTree = render(state)
