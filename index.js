@@ -18,7 +18,7 @@ var state = {
   accounts: extend(traceData.accounts),
   calls: [],
   frameIndex: 0,
-  autoplay: true,
+  autoplay: false,
 }
 
 var totalCalls = traceData.calls.length
@@ -96,28 +96,30 @@ function render(state) {
   return (
 
     h('div', { style: { fontFamily: 'Open Sans' } }, [
-      h('h1', { style: {textTransform: "uppercase", 
-                        fontWeight: 300,
-                        letterSpacing: "2px"}},'Transaction Replay'),
-      h('h2', `Step ${state.frameIndex} of ${totalCalls}`),
-      h('h2', `Stack Level: ${stackDepth}`),
-      h('h2', autoplayStatus()),
-      renderNavigation({
-          forwardFrame: forwardFrame,
-          backFrame: backFrame,
-          toggleAutoplay: toggleAutoplay
-      }),
+      // h('h1', { style: {textTransform: "uppercase", 
+      //                   fontWeight: 300,
+      //                   letterSpacing: "2px"}},'Transaction Replay'),
       h('div', {
         style: {
           display: 'flex',
+          alignItems: 'flex-top',
         }
       }, [
-        renderGraph(state),
         renderCallHistory(state.frameIndex, traceData.calls, {
           selectFrame: selectFrame
-        })
+        }),
+        renderGraph(state),
       ])
     ])
 
   )
 }
+
+      // h('h2', `Step ${state.frameIndex} of ${totalCalls}`),
+      // h('h2', `Stack Level: ${stackDepth}`),
+      // h('h2', autoplayStatus()),
+      // renderNavigation({
+      //     forwardFrame: forwardFrame,
+      //     backFrame: backFrame,
+      //     toggleAutoplay: toggleAutoplay
+      // }),
