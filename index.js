@@ -20,7 +20,7 @@ var state = {
   frameIndex: 0,
   totalCalls: traceData.calls.length,
   stackDepth: 0,
-  autoplay: false,
+  autoplay: true,
 }
 
 var totalCalls = traceData.calls.length
