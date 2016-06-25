@@ -20,6 +20,7 @@ function renderRoot(state, send){
           forwardFrame: () => send('viz:selectFrame', { value: state.frameIndex+1 }),
           backFrame: () => send('viz:selectFrame', { value: state.frameIndex-1 }),
           toggleAutoplay: () => send('viz:setAutoplay', { value: !state.autoplay }),
+          setAutoplay: (value) => send('viz:setAutoplay', { value: value }),
         }),
         renderGraph(state),
       ])

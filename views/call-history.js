@@ -75,6 +75,7 @@ module.exports = function(state, actions) {
           },
           onclick:() => {
             actions.selectFrame(index)
+            actions.setAutoplay(false)
           },
         }, [
           h('p', {style: {fontWeight: 600}}, `${index+1}: ${label}`),
