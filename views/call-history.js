@@ -2,8 +2,9 @@ const h = require('virtual-dom/virtual-hyperscript')
 const renderNavigation = require('./navigation')
 
 
-module.exports = function(state, calls, actions) {
+module.exports = function(state, actions) {
   let selectedItemTop
+  let callStack = state.stackFrames[state.frameIndex].map((callIndex) => state.allCalls[callIndex])
 
   const menu = h('div', {
     style: {
@@ -23,14 +24,14 @@ module.exports = function(state, calls, actions) {
         padding: '20px',
       },
     }, [
-      h('h3', {style: {color: 'white', fontWeight: 300, margin: 0}}, `Step ${state.frameIndex} of ${state.totalCalls}`),
+      h('h3', {style: {color: 'white', fontWeight: 300, margin: 0}}, `Step ${state.frameIndex+1} of ${state.allCalls.length}`),
       renderNavigation({
         forwardFrame: actions.forwardFrame,
         backFrame: actions.backFrame,
         toggleAutoplay: actions.toggleAutoplay,
       }),
-      h('h4', {style: {color: 'white', margin: 0}}, actions.autoplayStatus()),
-      h('h4', {style: {color: 'white', margin: 0}}, `Stack Level: ${state.stackDepth}`),
+      h('h4', {style: {color: 'white', margin: 0}}, `Autoplay: ${state.autoplay ? 'ENABLED' : 'DISABLED'}`),
+      h('h4', {style: {color: 'white', margin: 0}}, `Stack Depth: ${callStack.length}`),
 
     ]),
 
@@ -61,13 +62,13 @@ module.exports = function(state, calls, actions) {
         overflowY: 'auto',
         overflowX: 'hidden',
        },
-    }, calls.map((call, index) => {
+    }, state.allCalls.map((call, index) => {
       const selected = index === state.frameIndex
-      const selector = selected ? 'li.selected' : 'li'
+      const classes = selected ? '.selected' : ''
       const { fromAddress, toAddress, label } = call
       return (
 
-        h(`${selector}#stack-item-${index}`, {
+        h(`li${classes}#stack-item-${index}`, {
           style: {
             display: 'block',
             padding: '10px',

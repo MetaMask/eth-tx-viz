@@ -1,18 +1,20 @@
 const extend = require('xtend')
 const h = require('virtual-dom/virtual-hyperscript/svg')
 const h2 = require('virtual-dom/virtual-hyperscript')
-const contractNicknames = require('./nicknames.json')
-const ColorPalette = require('./palette')
+const contractNicknames = require('../lib/nicknames.json')
+const ColorPalette = require('../lib/palette')
 
 
 module.exports = render
 
 function render(state){
 
+  let callStack = state.stackFrames[state.frameIndex].map((callIndex) => state.allCalls[callIndex])
+
   var defs = [markerArrow()]
   var nodePositions = calcNodePositions(state.accounts)
   var nodes = h('g.nodes', renderAccounts(nodePositions, state.accounts))
-  var links = h('g.links', renderCalls(nodePositions, state.calls))
+  var links = h('g.links', renderCalls(nodePositions, callStack))
 
   return (
 
@@ -159,6 +161,7 @@ function circle(center, radius, attrs) {
 }
 
 function path(id, start, end, attrs){
+  if (!start || !end) debugger
   return (
 
     h('path', extend({

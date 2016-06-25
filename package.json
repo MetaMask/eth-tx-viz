@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "choo": "^2.3.1",
     "ethereumjs-abi": "^0.6.2",
     "ethereumjs-util": "^4.4.1",
     "virtual-dom": "^2.1.1",
