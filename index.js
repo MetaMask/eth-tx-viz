@@ -97,9 +97,6 @@ function render(state) {
   return (
 
     h('div', { style: { fontFamily: 'Open Sans' } }, [
-      // h('h1', { style: {textTransform: "uppercase", 
-      //                   fontWeight: 300,
-      //                   letterSpacing: "2px"}},'Transaction Replay'),
       h('div', {
         style: {
           display: 'flex',
@@ -121,11 +118,3 @@ function render(state) {
   )
 }
 
-      // h('h2', `Step ${state.frameIndex} of ${totalCalls}`),
-      // h('h2', `Stack Level: ${stackDepth}`),
-      // h('h2', autoplayStatus()),
-      // renderNavigation({
-      //     forwardFrame: forwardFrame,
-      //     backFrame: backFrame,
-      //     toggleAutoplay: toggleAutoplay
-      // }),
