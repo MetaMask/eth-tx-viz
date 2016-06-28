@@ -39,18 +39,14 @@ app.router((route) => [
   route('/', view)
 ])
 
-var container = document.createElement('div')
-document.body.appendChild(container)
-container.id = 'app-container'
-app.start('#app-container')
+var tree = app.start()
+document.body.appendChild(tree)
 
 
 function view (params, state, send) {
   return createElement(
 
-    h('#app-container', [
-      renderRoot(state.viz, send)
-    ])
+    renderRoot(state.viz, send)
 
   )
 } 
