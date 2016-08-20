@@ -26,9 +26,22 @@ function renderRoot(state, send){
         h('div', {
           style: {
             marginRight: '30%',
+            height: '100vh',
+            // overflow: 'hidden',
           },
         }, [
           h('h2.title', 'Transaction Replay'),
+          h('input.tx-hash', {
+            value: '0xc0b6d5916bff007ef3a349b9191300e210a5fbb1db7f1cece50184c479947bc3',
+            style: {
+              marginBottom: '20px',
+              width: '600px',
+              height: '36px',
+              fontSize: '1em',
+              textAlign: 'center',
+            },
+            onchange: (event) => send('viz:loadTx', { value: event.target.value }),
+          }),
           renderGraph(state),
         ])
 
