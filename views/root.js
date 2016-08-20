@@ -22,7 +22,16 @@ function renderRoot(state, send){
           toggleAutoplay: () => send('viz:setAutoplay', { value: !state.autoplay }),
           setAutoplay: (value) => send('viz:setAutoplay', { value: value }),
         }),
-        renderGraph(state),
+
+        h('div', {
+          style: {
+            marginRight: '30%',
+          },
+        }, [
+          h('h2.title', 'Transaction Replay'),
+          renderGraph(state),
+        ])
+
       ])
     ])
 

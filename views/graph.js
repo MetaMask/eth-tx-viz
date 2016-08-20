@@ -1,6 +1,6 @@
 const extend = require('xtend')
-const h = require('virtual-dom/virtual-hyperscript/svg')
-const h2 = require('virtual-dom/virtual-hyperscript')
+const h = require('virtual-dom/virtual-hyperscript')
+const svg = require('virtual-dom/virtual-hyperscript/svg')
 const contractNicknames = require('../lib/nicknames.json')
 const ColorPalette = require('../lib/palette')
 
@@ -13,22 +13,15 @@ function render(state){
 
   var defs = [markerArrow()]
   var nodePositions = calcNodePositions(state.accounts)
-  var nodes = h('g.nodes', renderAccounts(nodePositions, state.accounts))
-  var links = h('g.links', renderCalls(nodePositions, callStack))
+  var nodes = svg('g.nodes', renderAccounts(nodePositions, state.accounts))
+  var links = svg('g.links', renderCalls(nodePositions, callStack))
 
   return (
 
-    h2('div', {
-      style: {
-        marginRight: '30%',
-      },
-    }, [
-      h2('h2.title', 'Transaction Replay'),
-      svg([
-        h('defs', defs),
-        links,
-        nodes,
-      ])
+    createSvg([
+      svg('defs', defs),
+      links,
+      nodes,
     ])
 
   )
@@ -80,7 +73,7 @@ function renderCalls(nodePositions, callList){
       var methodLabel = pathLabel(pathId, dataLabelText, { dy: '12' })
     }
 
-    return h('g', [
+    return svg('g', [
 
       path(pathId, start, end, { stroke: color }),
       ethLabel,
@@ -92,7 +85,7 @@ function renderCalls(nodePositions, callList){
 }
 
 function renderAccount(nodeCenter, color, account){
-  return h('g', [
+  return svg('g', [
 
     circle(nodeCenter, 20, {
       stroke: color,
@@ -104,10 +97,10 @@ function renderAccount(nodeCenter, color, account){
   ])
 }
 
-function svg(children){
+function createSvg(children){
   return (
 
-    h('svg', {
+    svg('svg', {
       height: '480',
       version: '1.1',
       width: '500',
@@ -128,7 +121,7 @@ function svg(children){
 function markerArrow(){
   return (
 
-    h('marker#markerArrow', {
+    svg('marker#markerArrow', {
       'markerWidth': '13',
       'markerHeight': '13',
       'refX': '20',
@@ -136,7 +129,7 @@ function markerArrow(){
       'orient': 'auto',
       'id': 'markerArrow',
     }, [
-      h('path', {
+      svg('path', {
         'd': 'M2,2 L2,11 L10,6 L2,2',
         'style': {
           'fill': '#000000',
@@ -151,7 +144,7 @@ function markerArrow(){
 function circle(center, radius, attrs) {
   return (
 
-    h('circle', extend({
+    svg('circle', extend({
       cx: center[0],
       cy: center[1],
       r: radius,
@@ -164,7 +157,7 @@ function path(id, start, end, attrs){
   if (!start || !end) debugger
   return (
 
-    h('path', extend({
+    svg('path', extend({
       'id': id,
       'fill': 'none',
       'stroke': '#00bf85',
@@ -183,7 +176,7 @@ function label(pos, name, attrs){
   attrs = attrs || {}
   return (
 
-    h('text', extend({
+    svg('text', extend({
       'x': pos[0],
       'y': pos[1]-30,
       'style': {
@@ -199,7 +192,7 @@ function label(pos, name, attrs){
         lineHeight: 'normal',
       },
     }, attrs), [
-      h('tspan', extend({
+      svg('tspan', extend({
         'dy': '4.013669243112275',
       }, attrs.tspan), name)
     ])
@@ -211,14 +204,14 @@ function pathLabel(id, label, attrs){
   attrs = attrs || {}
   return (
 
-    h('text', extend({
+    svg('text', extend({
       dy: '-6',
       style: {
         'text-anchor': 'middle',
         font: '12px sans-serif',
       },
     }, attrs), [
-      h('textPath', extend({
+      svg('textPath', extend({
         'xlink:href': `#${id}`,
         'startOffset': '50%',
       }, attrs), label)
