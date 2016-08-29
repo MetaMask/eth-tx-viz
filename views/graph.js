@@ -37,8 +37,8 @@ function calcNodePositions(accountData){
     var layoutCenter = [260,220]
     var layoutCircleRadius = 200
     var nodeCenter = [
-      layoutCenter[0]+layoutCircleRadius*Math.cos(rotRadians),
-      layoutCenter[0]+layoutCircleRadius*Math.sin(rotRadians),
+      layoutCenter[0]-layoutCircleRadius*Math.cos(rotRadians),
+      layoutCenter[0]-layoutCircleRadius*Math.sin(rotRadians),
     ]
     nodePositions[account.address] = nodeCenter
   })
