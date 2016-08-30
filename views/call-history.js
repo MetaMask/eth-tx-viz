@@ -5,38 +5,8 @@ const renderNavigation = require('./navigation')
 module.exports = function(state, actions) {
   let selectedItemTop
   let traceData = state.traceData
-  let callStack = traceData.stackFrames[state.frameIndex].map((callIndex) => traceData.calls[callIndex])
 
-  const menu = h('div', {
-    style: {
-      background: '#EBEBEB',
-      maxWidth: '220px',
-      flex: -1,
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis',
-    },
-  }, [
-
-    // orange control block
-    h('div', {
-      style: {
-        backgroundColor: '#FA6B16',
-        padding: '20px',
-      },
-    }, [
-      h('h3', {style: {color: 'white', fontWeight: 300, margin: 0}}, `Step ${state.frameIndex+1} of ${traceData.calls.length}`),
-      renderNavigation({
-        forwardFrame: actions.forwardFrame,
-        backFrame: actions.backFrame,
-        toggleAutoplay: actions.toggleAutoplay,
-      }),
-      h('h4', {style: {color: 'white', margin: 0}}, `Autoplay: ${state.autoplay ? 'ENABLED' : 'DISABLED'}`),
-      h('h4', {style: {color: 'white', margin: 0}}, `Stack Depth: ${callStack.length}`),
-
-    ]),
+  return [
 
     h('style', `
       li {
@@ -65,6 +35,7 @@ module.exports = function(state, actions) {
         paddingLeft: '0px',
         overflowY: 'auto',
         overflowX: 'hidden',
+        margin: '4px 0',
        },
     }, traceData.calls.map((call, index) => {
       const selected = index === state.frameIndex
@@ -88,8 +59,7 @@ module.exports = function(state, actions) {
         ])
 
       )
-    }))
-  ])
+    })),
 
-  return menu
+  ]
 }

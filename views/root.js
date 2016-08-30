@@ -1,6 +1,7 @@
 const h = require('virtual-dom/virtual-hyperscript')
 const renderGraph = require('./graph')
 const renderCallHistory = require('./call-history')
+const renderControls = require('./controls')
 
 module.exports = renderRoot
 
@@ -17,13 +18,32 @@ function renderRoot(state, send){
       }, [
         
         // left panel
-        state.traceData && renderCallHistory(state, {
-          selectFrame: (index) => send('viz:selectFrame', { value: index }),
-          forwardFrame: () => send('viz:selectFrame', { value: state.frameIndex+1 }),
-          backFrame: () => send('viz:selectFrame', { value: state.frameIndex-1 }),
-          toggleAutoplay: () => send('viz:setAutoplay', { value: !state.autoplay }),
-          setAutoplay: (value) => send('viz:setAutoplay', { value: value }),
-        }),
+        h('div', {
+          style: {
+            background: '#EBEBEB',
+            maxWidth: '220px',
+            flex: -1,
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+          },
+        }, [
+          // controls
+          state.traceData ? 
+            renderControls(state, {
+              forwardFrame: () => send('viz:selectFrame', { value: state.frameIndex+1 }),
+              backFrame: () => send('viz:selectFrame', { value: state.frameIndex-1 }),
+              toggleAutoplay: () => send('viz:setAutoplay', { value: !state.autoplay }),
+            }) : null,
+          // call history
+          state.traceData ? 
+            renderCallHistory(state, {
+              selectFrame: (index) => send('viz:selectFrame', { value: index }),
+              setAutoplay: (value) => send('viz:setAutoplay', { value: value }),
+            }) : null,
+        ]),
 
         // right workspace
         h('div', {
