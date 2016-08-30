@@ -2,6 +2,7 @@ const h = require('virtual-dom/virtual-hyperscript')
 const renderGraph = require('./graph')
 const renderCallHistory = require('./call-history')
 const renderControls = require('./controls')
+const renderExamples = require('./examples')
 
 module.exports = renderRoot
 
@@ -56,7 +57,7 @@ function renderRoot(state, send){
           h('h2.title', 'Transaction Replay'),
           // tx input
           h('input.tx-hash', {
-            value: state.targetTx,
+            placeholder: state.targetTx,
             style: {
               marginBottom: '20px',
               width: '600px',
@@ -70,7 +71,9 @@ function renderRoot(state, send){
           // graph
           state.traceData ?
             renderGraph(state)
-          : h('h3', 'loading...'),
+          : state.targetTx ?
+              h('h3', 'loading...')
+            : renderExamples(send),
 
         ])
 

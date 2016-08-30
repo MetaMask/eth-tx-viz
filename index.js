@@ -7,7 +7,6 @@ const h = require('virtual-dom/virtual-hyperscript')
 const renderRoot = require('./views/root')
 const addAbiData = require('./lib/add-abi-data')
 const ABIs = require('./lib/abi')
-const defaultTraceData = require('./trace.json')
 const RPC_ENDPOINT = 'https://morden.infura.io/'
 
 
@@ -78,6 +77,12 @@ function setupApp(){
         }
         done()
       },
+      navigateToTx: (data, state, send, done) => {
+        var targetTx = data.value
+        var newurl = window.location.origin + window.location.pathname + '?tx='+targetTx
+        window.history.pushState({ path: newurl }, '', newurl)
+        send('viz:loadTx', { value: targetTx }, done)
+      },
     },
     subscriptions: [
       (send) => {
@@ -94,7 +99,7 @@ function setupApp(){
       var query = parseQs(state.location.pathname)
       var newTargetTx = query.tx
       var currentTargetTx = state.viz.targetTx
-      if (newTargetTx !== currentTargetTx) send('viz:loadTx', { value: newTargetTx }, noop)
+      if (newTargetTx && newTargetTx !== currentTargetTx) send('viz:loadTx', { value: newTargetTx }, noop)
       return view(state, prev, send)
     }),
   ])
