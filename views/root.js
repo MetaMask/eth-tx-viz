@@ -57,7 +57,7 @@ function renderRoot(state, send){
           h('h2.title', 'Transaction Replay'),
           // tx input
           h('input.tx-hash', {
-            placeholder: state.targetTx,
+            placeholder: state.targetTx || '',
             style: {
               marginBottom: '20px',
               width: '600px',
@@ -65,7 +65,7 @@ function renderRoot(state, send){
               fontSize: '1em',
               textAlign: 'center',
             },
-            onchange: (event) => send('viz:loadTx', { value: event.target.value }),
+            onchange: (event) => send('viz:navigateToTx', { value: event.target.value }),
           }),
 
           // graph
