@@ -7,70 +7,122 @@ const h = require('virtual-dom/virtual-hyperscript')
 const renderRoot = require('./views/root')
 const addAbiData = require('./lib/add-abi-data')
 const ABIs = require('./lib/abi')
-const traceData = require('./trace.json')
-
-const RPC_ENDPOINT = 'http://localhost:8545/'
-var provider = ZeroClient({ rpcUrl: RPC_ENDPOINT })
+const defaultTraceData = require('./trace.json')
+const RPC_ENDPOINT = 'https://morden.infura.io/'
 
 
-// decorate calls with ABI-sourced data
-addAbiData(traceData.calls, ABIs)
+var app = undefined
+var provider = undefined
+window.addEventListener('load', setupProvider)
 
-const app = choo()
 
-app.model({
-  namespace: 'viz',
-  state: {
-    accounts: extend(traceData.accounts),
-    stackFrames: traceData.stackFrames,
-    allCalls: traceData.calls,
-    frameIndex: 0,
-    autoplay: true,
-  },
-  reducers: {
-    setAutoplay: (action, state) => ({ autoplay: action.value }),
-    selectFrame: (action, state) => ({ frameIndex: action.value }),
-    setTraceData: (action, state) => ({
+
+function setupProvider(){
+
+  if (global.web3) {
+    provider = global.web3.currentProvider
+    console.log('using environmental web3')
+  } else {
+    provider = ZeroClient({ rpcUrl: RPC_ENDPOINT })
+    console.log('using zero client')
+  }
+
+  setupApp()
+
+}
+
+function setupApp(){
+
+  app = choo()
+
+  app.model({
+    namespace: 'viz',
+    state: {
       frameIndex: 0,
       autoplay: true,
-      accounts: action.value.accounts,
-      stackFrames: action.value.stackFrames,
-      allCalls: action.value.calls,
-    }),
-  },
-  effects: {
-    loadTx: (data, state, send, done) => {
-      var targetTx = data.value
-      send('viz:setAutoplay', { value: false })
-      generateCallTrace(targetTx, provider, function(err, callTrace){
-        if (err) throw err
-        addAbiData(callTrace.calls, ABIs)
-        send('viz:setTraceData', { value: callTrace })
-      })
-    }
-  },
-  subscriptions: [
-    (send) => setInterval(() => {
-      var state = send.state().viz
-      if (state.autoplay && state.frameIndex < (state.stackFrames.length-1)) {
-        send('viz:selectFrame', { value: state.frameIndex+1 })
+      targetTx: null,
+      traceData: null,
+      // accounts: extend(traceData.accounts),
+      // stackFrames: traceData.stackFrames,
+      // allCalls: traceData.calls,
+    },
+    reducers: {
+      setAutoplay: (action, state) => ({ autoplay: action.value }),
+      selectFrame: (action, state) => ({ frameIndex: action.value }),
+      setTargetTx: (action, state) => ({
+        targetTx: action.value,
+        traceData: null
+      }),
+      setTraceData: (action, state) => ({
+        frameIndex: 0,
+        autoplay: true,
+        traceData: action.value,
+      }),
+    },
+    effects: {
+      loadTx: (data, state, send, done) => {
+        var targetTx = data.value
+        send('viz:setTargetTx', { value: targetTx }, function(){
+          generateCallTrace(targetTx, provider, function(err, callTrace){
+            if (err) throw err
+            // decorate calls with ABI-sourced data
+            addAbiData(callTrace.calls, ABIs)
+            send('viz:setTraceData', { value: callTrace }, done)
+          })
+        })
+      },
+      tick: (data, state, send, done) => {
+        if (state.autoplay && state.traceData && state.frameIndex < (state.traceData.stackFrames.length-1)) {
+          send('viz:selectFrame', { value: state.frameIndex+1 }, done)
+          return
+        }
+        done()
+      },
+    },
+    subscriptions: [
+      (send) => {
+        setInterval(() => {
+          send('viz:tick', noop)
+        }, 1000)
       }
-    }, 1000)
-  ],
-})
+    ],
+  })
 
-app.router((route) => [
-  route('/', view)
-])
+  app.router((route) => [
+    route('/', function(state, prev, send){
+      // check for changes to query params state
+      var query = parseQs(state.location.pathname)
+      var newTargetTx = query.tx
+      var currentTargetTx = state.viz.targetTx
+      if (newTargetTx !== currentTargetTx) send('viz:loadTx', { value: newTargetTx }, noop)
+      return view(state, prev, send)
+    }),
+  ])
 
-var tree = app.start()
-document.body.appendChild(tree)
+  var tree = app.start()
+  document.body.appendChild(tree)
+}
 
-
-function view (params, state, send) {
+function view (state, params, send) {
   return createElement(
 
     renderRoot(state.viz, send)
 
   )
 } 
+
+function noop(){}
+
+// decode a uri into a kv representation :: str -> obj
+function parseQs(uri){
+  const decodeURIComponent = window.decodeURIComponent
+  const reg = new RegExp('([^?=&]+)(=([^&]*))?', 'g')
+
+  const obj = {}
+  uri.replace(/^.*\?/, '').replace(reg, map)
+  return obj
+
+  function map (a0, a1, a2, a3) {
+    obj[decodeURIComponent(a1)] = decodeURIComponent(a3)
+  }
+}

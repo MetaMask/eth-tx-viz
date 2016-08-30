@@ -9,11 +9,12 @@ module.exports = render
 
 function render(state){
 
-  let callStack = state.stackFrames[state.frameIndex].map((callIndex) => state.allCalls[callIndex])
+  let traceData = state.traceData
+  let callStack = traceData.stackFrames[state.frameIndex].map((callIndex) => traceData.calls[callIndex])
 
   var defs = [markerArrow()]
-  var nodePositions = calcNodePositions(state.accounts)
-  var nodes = svg('g.nodes', renderAccounts(nodePositions, state.accounts))
+  var nodePositions = calcNodePositions(traceData.accounts)
+  var nodes = svg('g.nodes', renderAccounts(nodePositions, traceData.accounts))
   var links = svg('g.links', renderCalls(nodePositions, callStack))
 
   return (

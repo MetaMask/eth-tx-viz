@@ -15,7 +15,9 @@ function renderRoot(state, send){
           alignItems: 'flex-top',
         }
       }, [
-        renderCallHistory(state, {
+        
+        // left panel
+        state.traceData && renderCallHistory(state, {
           selectFrame: (index) => send('viz:selectFrame', { value: index }),
           forwardFrame: () => send('viz:selectFrame', { value: state.frameIndex+1 }),
           backFrame: () => send('viz:selectFrame', { value: state.frameIndex-1 }),
@@ -23,16 +25,18 @@ function renderRoot(state, send){
           setAutoplay: (value) => send('viz:setAutoplay', { value: value }),
         }),
 
+        // right workspace
         h('div', {
           style: {
             marginRight: '30%',
             height: '100vh',
-            // overflow: 'hidden',
           },
         }, [
+          // label
           h('h2.title', 'Transaction Replay'),
+          // tx input
           h('input.tx-hash', {
-            value: '0xc0b6d5916bff007ef3a349b9191300e210a5fbb1db7f1cece50184c479947bc3',
+            value: state.targetTx,
             style: {
               marginBottom: '20px',
               width: '600px',
@@ -42,7 +46,12 @@ function renderRoot(state, send){
             },
             onchange: (event) => send('viz:loadTx', { value: event.target.value }),
           }),
-          renderGraph(state),
+
+          // graph
+          state.traceData ?
+            renderGraph(state)
+          : h('h3', 'loading...'),
+
         ])
 
       ])

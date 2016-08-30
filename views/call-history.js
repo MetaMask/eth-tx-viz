@@ -4,7 +4,8 @@ const renderNavigation = require('./navigation')
 
 module.exports = function(state, actions) {
   let selectedItemTop
-  let callStack = state.stackFrames[state.frameIndex].map((callIndex) => state.allCalls[callIndex])
+  let traceData = state.traceData
+  let callStack = traceData.stackFrames[state.frameIndex].map((callIndex) => traceData.calls[callIndex])
 
   const menu = h('div', {
     style: {
@@ -18,13 +19,15 @@ module.exports = function(state, actions) {
       textOverflow: 'ellipsis',
     },
   }, [
+
+    // orange control block
     h('div', {
       style: {
         backgroundColor: '#FA6B16',
         padding: '20px',
       },
     }, [
-      h('h3', {style: {color: 'white', fontWeight: 300, margin: 0}}, `Step ${state.frameIndex+1} of ${state.allCalls.length}`),
+      h('h3', {style: {color: 'white', fontWeight: 300, margin: 0}}, `Step ${state.frameIndex+1} of ${traceData.calls.length}`),
       renderNavigation({
         forwardFrame: actions.forwardFrame,
         backFrame: actions.backFrame,
@@ -55,6 +58,7 @@ module.exports = function(state, actions) {
       }
     `),
 
+    // call list
     h('ol', {
       height: '100%',
       style: {
@@ -62,7 +66,7 @@ module.exports = function(state, actions) {
         overflowY: 'auto',
         overflowX: 'hidden',
        },
-    }, state.allCalls.map((call, index) => {
+    }, traceData.calls.map((call, index) => {
       const selected = index === state.frameIndex
       const classes = selected ? '.selected' : ''
       const { fromAddress, toAddress, label } = call
