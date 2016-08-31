@@ -36,29 +36,48 @@ function setupApp(){
 
   app.model({
     namespace: 'viz',
+
     state: {
       frameIndex: 0,
       autoplay: true,
       targetTx: null,
       traceData: null,
-      // accounts: extend(traceData.accounts),
-      // stackFrames: traceData.stackFrames,
-      // allCalls: traceData.calls,
+      callStack: null,
     },
+
     reducers: {
-      setAutoplay: (action, state) => ({ autoplay: action.value }),
-      selectFrame: (action, state) => ({ frameIndex: action.value }),
+      setAutoplay: (action, state) => ({
+        autoplay: action.value,
+      }),
       setTargetTx: (action, state) => ({
         targetTx: action.value,
         traceData: null
       }),
-      setTraceData: (action, state) => ({
-        frameIndex: 0,
-        autoplay: true,
-        traceData: action.value,
-      }),
+      updateTraceData: (action, state) => {
+        var traceData = action.traceData
+        var frameIndex = action.frameIndex
+        return {
+          traceData: traceData,
+          frameIndex: frameIndex,
+          callStack: traceData.stackFrames[frameIndex].map((callIndex) => traceData.calls[callIndex]),
+          activeLogs: traceData.logs.filter((log) => frameIndex >= log.stepIndex),
+        }
+      },
     },
+
     effects: {
+      selectFrame: (data, state, send, done) => {
+        var traceData = state.traceData
+        var frameIndex = data.value
+        send('viz:updateTraceData', { traceData, frameIndex }, done)
+      },
+      setTraceData: (data, state, send, done) => {
+        var traceData = data.value
+        var frameIndex = 0
+        send('viz:updateTraceData', { traceData, frameIndex }, function(){
+          send('viz:setAutoplay', { value: true }, done)
+        })
+      },
       loadTx: (data, state, send, done) => {
         var targetTx = data.value
         send('viz:setTargetTx', { value: targetTx }, function(){
@@ -84,6 +103,7 @@ function setupApp(){
         send('viz:loadTx', { value: targetTx }, done)
       },
     },
+
     subscriptions: [
       (send) => {
         setInterval(() => {
@@ -91,6 +111,7 @@ function setupApp(){
         }, 1000)
       }
     ],
+
   })
 
   app.router((route) => [

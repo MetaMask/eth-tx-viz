@@ -5,7 +5,7 @@ const renderNavigation = require('./navigation')
 module.exports = function(state, actions) {
   let selectedItemTop
   let traceData = state.traceData
-  let callStack = traceData.stackFrames[state.frameIndex].map((callIndex) => traceData.calls[callIndex])
+  let callStack = state.callStack
 
   return (
 

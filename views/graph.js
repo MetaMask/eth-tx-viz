@@ -10,17 +10,25 @@ module.exports = render
 function render(state){
 
   let traceData = state.traceData
-  let callStack = traceData.stackFrames[state.frameIndex].map((callIndex) => traceData.calls[callIndex])
+  let callStack = state.callStack
 
   var defs = [markerArrow()]
   var nodePositions = calcNodePositions(traceData.accounts)
-  var nodes = svg('g.nodes', renderAccounts(nodePositions, traceData.accounts))
+  var nodes = svg('g.nodes', renderAccounts(nodePositions, traceData.accounts, state.activeLogs))
   var links = svg('g.links', renderCalls(nodePositions, callStack))
 
   return (
 
     createSvg([
       svg('defs', defs),
+      svg('style', `
+        .peekaboo-parent:not(:hover) .peekaboo-hidden {
+          display: none;
+        }
+        .peekaboo-parent:hover .peekaboo-show {
+          display: none;
+        }
+      `),
       links,
       nodes,
     ])
@@ -47,16 +55,17 @@ function calcNodePositions(accountData){
 }
 
 // accounts -> nodes
-function renderAccounts(nodePositions, accountData){
+function renderAccounts(nodePositions, accountData, logs){
   var pallete = ColorPalette()
   return valuesFor(accountData).map((account, index) => {
     var color = pallete.getColor()
     var nodeCenter = nodePositions[account.address]
-    return renderAccount(nodeCenter, color, account)
+    var logsForAccount = logs.filter((log) => log.address === account.address)
+    return renderAccount(nodeCenter, color, account, logsForAccount)
   })
 }
 
-// accounts -> nodes
+// calls -> links
 function renderCalls(nodePositions, callList){
   var pallete = ColorPalette()
 
@@ -85,17 +94,73 @@ function renderCalls(nodePositions, callList){
 
 }
 
-function renderAccount(nodeCenter, color, account){
-  return svg('g', [
+function renderAccount(nodeCenter, color, account, logs){
+  return svg('g', { class: 'peekaboo-parent' }, [
 
     circle(nodeCenter, 20, {
       stroke: color,
       fill: color,
     }),
 
-    label(nodeCenter, getNodeLabel(account.address)),
+    label(nodeCenter, getNodeLabel(account.address), { dy: -30 }),
+    renderLogs(nodeCenter, logs, { dy: 30 }),
 
   ])
+}
+
+function renderLogs(pos, logs, attrs){
+  attrs = attrs || {}
+  var dy = attrs.dy || 0
+  var logCount = `${logs.length} ${logs.length === 1 ? 'log' : 'logs'}`
+  var logLabel = logs.map((log) => log.topics[0]).join('\n')
+  return (
+
+    svg('text', extend({
+      x: pos[0],
+      y: pos[1]+dy,
+      style: {
+        fontSize: '10px',
+        stroke: 'none',
+        textAnchor: 'middle',
+        fontFamily: 'Fontin-Sans, Arial',
+        fontSize: '12px',
+        fontStyle: 'normal',
+        fontVariant: 'normal',
+        fontWeight: 'normal',
+        fontStretch: 'normal',
+        lineHeight: 'normal',
+      },
+    }, attrs), [
+
+      // default label
+      svg('tspan', extend({
+        class: 'peekaboo-show',
+        dy: '4',
+      }, attrs.tspan), logCount),
+
+      // hover label
+      logs.map((log) => {
+        var logLabel = 'LOG'+log.topics.length
+        return [
+          svg('tspan', extend({
+            class: 'peekaboo-hidden',
+            x: pos[0],
+            dy: '1.2em',
+          }), logLabel),
+          log.topics.map((topic) => {
+            return svg('tspan', extend({
+              class: 'peekaboo-hidden',
+              x: pos[0],
+              dy: '1.2em',
+            }), topic)
+          }),
+        ]
+      })
+
+    ])
+
+  )
+
 }
 
 function createSvg(children){
@@ -175,11 +240,12 @@ function path(id, start, end, attrs){
 
 function label(pos, name, attrs){
   attrs = attrs || {}
+  var dy = attrs.dy || 0
   return (
 
     svg('text', extend({
       'x': pos[0],
-      'y': pos[1]-30,
+      'y': pos[1]+dy,
       'style': {
         fontSize: '10px',
         stroke: 'none',
@@ -194,7 +260,7 @@ function label(pos, name, attrs){
       },
     }, attrs), [
       svg('tspan', extend({
-        'dy': '4.013669243112275',
+        'dy': '4',
       }, attrs.tspan), name)
     ])
 
