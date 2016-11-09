@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "choo": "^3.2.0",
-    "eth-tx-summary": "^2.2.0",
-    "ethereumjs-abi": "^0.6.2",
-    "ethereumjs-util": "^4.4.1",
+    "choo": "^3.3.0",
+    "eth-tx-summary": "^2.2.1",
+    "ethereumjs-abi": "^0.6.4",
+    "ethereumjs-util": "^4.5.0",
     "virtual-dom": "^2.1.1",
     "xtend": "^4.0.1"
   },
