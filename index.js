@@ -7,7 +7,7 @@ const h = require('virtual-dom/virtual-hyperscript')
 const renderRoot = require('./views/root')
 const addAbiData = require('./lib/add-abi-data')
 const ABIs = require('./lib/abi')
-const RPC_ENDPOINT = 'https://morden.infura.io/'
+const RPC_ENDPOINT = 'https://mainnet.infura.io/'
 
 
 var app = undefined
