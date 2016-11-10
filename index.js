@@ -1,11 +1,13 @@
 const choo = require('choo')
 const extend = require('xtend')
+const async = require('async')
 const ZeroClient = require('web3-provider-engine/zero')
 const generateCallTrace = require('eth-tx-summary/call-trace')
 const createElement = require('virtual-dom/create-element')
 const h = require('virtual-dom/virtual-hyperscript')
 const renderRoot = require('./views/root')
 const addAbiData = require('./lib/add-abi-data')
+const decorateCallTrace = require('./lib/decorate-call-trace')
 const ABIs = require('./lib/abi')
 const RPC_ENDPOINT = 'https://mainnet.infura.io/'
 
@@ -80,14 +82,14 @@ function setupApp(){
       },
       loadTx: (data, state, send, done) => {
         var targetTx = data.value
-        send('viz:setTargetTx', { value: targetTx }, function(){
-          generateCallTrace(targetTx, provider, function(err, callTrace){
-            if (err) throw err
-            // decorate calls with ABI-sourced data
-            addAbiData(callTrace.calls, ABIs)
-            send('viz:setTraceData', { value: callTrace }, done)
-          })
-        })
+
+        async.waterfall([
+          (cb) => send('viz:setTargetTx', { value: targetTx }, cb),
+          (_, cb) => generateCallTrace(targetTx, provider, cb),
+          (callTrace, cb) => decorateCallTrace(callTrace, cb),
+          (callTrace, cb) => send('viz:setTraceData', { value: callTrace }, cb),
+        ], done)
+
       },
       tick: (data, state, send, done) => {
         if (state.autoplay && state.traceData && state.frameIndex < (state.traceData.stackFrames.length-1)) {

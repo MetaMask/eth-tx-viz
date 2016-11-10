@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "async": "^2.1.2",
     "choo": "^3.3.0",
     "eth-tx-summary": "^2.2.1",
     "ethereumjs-abi": "^0.6.4",
     "ethereumjs-util": "^4.5.0",
     "virtual-dom": "^2.1.1",
+    "xhr": "^2.2.2",
     "xtend": "^4.0.1"
   },
   "devDependencies": {},
