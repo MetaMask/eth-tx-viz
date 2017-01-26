@@ -6,7 +6,7 @@
   "dependencies": {
     "async": "^2.1.2",
     "choo": "^3.3.0",
-    "eth-tx-summary": "^2.2.3",
+    "eth-tx-summary": "^2.2.5",
     "ethereumjs-abi": "^0.6.4",
     "ethereumjs-util": "^5.0.1",
     "virtual-dom": "^2.1.1",
