@@ -1,7 +1,7 @@
 const extend = require('xtend')
 const h = require('virtual-dom/virtual-hyperscript')
 const svg = require('virtual-dom/virtual-hyperscript/svg')
-const contractNicknames = require('../lib/nicknames.json')
+const contractNicknames = require('../lib/nicknames')
 const ColorPalette = require('../lib/palette')
 
 
