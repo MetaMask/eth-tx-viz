@@ -1,0 +1,27 @@
+body {
+  margin: 0;
+}
+
+button {
+  background: white;
+  border: none;
+  border-radius: 5%;
+  width: 30px;
+  height: 30px;
+  margin-top: 7px;
+  margin-bottom: 7px;
+}
+
+button.middle {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.title {
+  font-weight: 300;
+  font-family: "Open Sans";
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  margin-top: 50px;
+}
