@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "async": "^2.1.2",
-    "choo": "^3.3.0",
+    "choo": "^5.0.4",
     "eth-tx-summary": "^2.2.3",
     "ethereumjs-abi": "^0.6.4",
     "ethereumjs-util": "^5.0.1",
