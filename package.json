@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "async": "^2.1.2",
+    "async": "^2.2.0",
     "choo": "^3.3.0",
     "eth-tx-summary": "^2.2.3",
     "ethereumjs-abi": "^0.6.4",
